@@ -54,6 +54,21 @@
         </el-card>
       </el-col>
     </el-row>
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :span="6">
+        <el-card>
+          <div class="card-content">
+            <div class="card-icon" style="background-color: #909399;">
+              <i class="el-icon-collection-tag"></i>
+            </div>
+            <div class="card-info">
+              <div class="card-title">品类总数</div>
+              <div class="card-value">{{ categoryCount }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -62,6 +77,7 @@ import { getGoodsList } from '@/api/goods'
 import { getOrderList } from '@/api/order'
 import { getInventoryList } from '@/api/inventory'
 import { getShipmentList } from '@/api/shipment'
+import { getCategoryList } from '@/api/category'
 
 export default {
   name: 'Dashboard',
@@ -70,7 +86,8 @@ export default {
       goodsCount: 0,
       orderCount: 0,
       inventoryCount: 0,
-      shipmentCount: 0
+      shipmentCount: 0,
+      categoryCount: 0
     }
   },
   mounted() {
@@ -79,16 +96,18 @@ export default {
   methods: {
     async loadDashboardData() {
       try {
-        const [goodsRes, orderRes, inventoryRes, shipmentRes] = await Promise.all([
+        const [goodsRes, orderRes, inventoryRes, shipmentRes, categoryRes] = await Promise.all([
           getGoodsList(),
           getOrderList(),
           getInventoryList(),
-          getShipmentList()
+          getShipmentList(),
+          getCategoryList()
         ])
         this.goodsCount = goodsRes.data?.length || 0
         this.orderCount = orderRes.data?.length || 0
         this.inventoryCount = inventoryRes.data?.length || 0
         this.shipmentCount = shipmentRes.data?.length || 0
+        this.categoryCount = categoryRes.data?.length || 0
       } catch (error) {
         console.error('加载仪表盘数据失败:', error)
       }

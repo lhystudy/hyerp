@@ -1,8 +1,11 @@
 package com.hyerp.controller;
 
 import com.hyerp.common.Result;
+import com.hyerp.dto.OrderCreateDTO;
 import com.hyerp.model.Order;
+import com.hyerp.model.OrderItem;
 import com.hyerp.service.OrderService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,9 +43,12 @@ public class OrderController {
     }
 
     @PostMapping
-    public Result<Order> createOrder(@RequestBody Order order) {
+    public Result<Order> createOrder(@RequestBody OrderCreateDTO orderDTO) {
         try {
-            Order created = orderService.createOrder(order);
+            Order order = new Order();
+            BeanUtils.copyProperties(orderDTO, order);
+            List<OrderItem> orderItems = orderDTO.getOrderItems();
+            Order created = orderService.createOrder(order, orderItems);
             return Result.success(created);
         } catch (Exception e) {
             return Result.error(e.getMessage());

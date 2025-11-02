@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyerp.dao.CategoryMapper">
+    <resultMap id="BaseResultMap" type="com.hyerp.model.Category">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="category_code" jdbcType="VARCHAR" property="categoryCode" />
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="sort_order" jdbcType="INTEGER" property="sortOrder" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    
+    <sql id="BaseColumnList">
+        `id`, `category_code`, `category_name`, `description`, `status`, `sort_order`, 
+        `create_time`, `update_time`
+    </sql>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.hyerp.model.Category" useGeneratedKeys="true">
+        INSERT INTO category (
+            `category_code`, `category_name`, `description`, `status`, `sort_order`, 
+            `create_time`, `update_time`
+        ) VALUES (
+            #{categoryCode}, #{categoryName}, #{description}, #{status}, #{sortOrder},
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyerp.model.Category">
+        UPDATE category
+        SET 
+            `category_code` = #{categoryCode},
+            `category_name` = #{categoryName},
+            `description` = #{description},
+            `status` = #{status},
+            `sort_order` = #{sortOrder},
+            `update_time` = #{updateTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM category WHERE `id` = #{id}
+    </delete>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM category
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM category
+        ORDER BY `sort_order` ASC, `create_time` DESC
+    </select>
+
+    <select id="selectByCategoryCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM category
+        WHERE `category_code` = #{categoryCode}
+    </select>
+
+    <select id="selectByStatus" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM category
+        WHERE `status` = #{status}
+        ORDER BY `sort_order` ASC, `create_time` DESC
+    </select>
+</mapper>
+

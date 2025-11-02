@@ -21,7 +21,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="unit" label="单位" width="100" />
-        <el-table-column prop="category" label="分类" width="120" />
+        <el-table-column prop="categoryName" label="品类" width="150" />
         <el-table-column prop="status" label="状态" width="100">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
@@ -52,8 +52,15 @@
         <el-form-item label="单位" prop="unit">
           <el-input v-model="goodsForm.unit" />
         </el-form-item>
-        <el-form-item label="分类" prop="category">
-          <el-input v-model="goodsForm.category" />
+        <el-form-item label="品类" prop="categoryId">
+          <el-select v-model="goodsForm.categoryId" placeholder="请选择品类" style="width: 100%" clearable>
+            <el-option
+              v-for="item in categoryOptions"
+              :key="item.id"
+              :label="item.categoryName"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="goodsForm.status">
@@ -75,6 +82,7 @@
 
 <script>
 import { getGoodsList, createGoods, updateGoods, deleteGoods } from '@/api/goods'
+import { getEnabledCategoryList, getCategoryList } from '@/api/category'
 
 export default {
   name: 'Goods',
@@ -82,6 +90,8 @@ export default {
     return {
       loading: false,
       goodsList: [],
+      categoryOptions: [], // 启用的品类选项（用于下拉选择）
+      allCategories: [], // 所有品类（用于显示品类名称）
       dialogVisible: false,
       dialogTitle: '新增商品',
       goodsForm: {
@@ -90,7 +100,7 @@ export default {
         goodsName: '',
         price: 0,
         unit: '',
-        category: '',
+        categoryId: null,
         status: 1,
         description: ''
       },
@@ -101,19 +111,46 @@ export default {
       }
     }
   },
-  mounted() {
-    this.loadGoodsList()
+  async mounted() {
+    await this.loadCategoryOptions()
+    await this.loadAllCategories()
+    await this.loadGoodsList()
   },
   methods: {
     async loadGoodsList() {
       this.loading = true
       try {
         const res = await getGoodsList()
-        this.goodsList = res.data || []
+        const goodsList = res.data || []
+        // 处理商品列表，添加品类名称显示
+        this.goodsList = goodsList.map(goods => {
+          const category = this.allCategories.find(cat => cat.id === goods.categoryId)
+          return {
+            ...goods,
+            categoryName: category ? category.categoryName : '未分类'
+          }
+        })
       } catch (error) {
         this.$message.error('加载商品列表失败')
       } finally {
         this.loading = false
+      }
+    },
+    async loadCategoryOptions() {
+      try {
+        const res = await getEnabledCategoryList()
+        this.categoryOptions = res.data || []
+      } catch (error) {
+        this.$message.error('加载品类列表失败')
+      }
+    },
+    async loadAllCategories() {
+      try {
+        const res = await getCategoryList()
+        this.allCategories = res.data || []
+      } catch (error) {
+        // 如果失败，使用启用的品类列表作为备用
+        this.allCategories = this.categoryOptions
       }
     },
     handleAdd() {
@@ -124,14 +161,21 @@ export default {
         goodsName: '',
         price: 0,
         unit: '',
-        category: '',
+        categoryId: null,
         status: 1,
         description: ''
       }
       this.dialogVisible = true
     },
-    handleEdit(row) {
+    async handleEdit(row) {
       this.dialogTitle = '编辑商品'
+      // 确保品类选项已加载
+      if (this.categoryOptions.length === 0) {
+        await this.loadCategoryOptions()
+      }
+      if (this.allCategories.length === 0) {
+        await this.loadAllCategories()
+      }
       this.goodsForm = { ...row }
       this.dialogVisible = true
     },
@@ -147,7 +191,9 @@ export default {
               this.$message.success('创建成功')
             }
             this.dialogVisible = false
-            this.loadGoodsList()
+            await this.loadCategoryOptions()
+            await this.loadAllCategories()
+            await this.loadGoodsList()
           } catch (error) {
             this.$message.error('操作失败')
           }

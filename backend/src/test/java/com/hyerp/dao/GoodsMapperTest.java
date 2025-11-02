@@ -25,7 +25,7 @@ public class GoodsMapperTest {
         goods.setDescription("这是一个测试商品");
         goods.setPrice(new BigDecimal("99.99"));
         goods.setUnit("件");
-        goods.setCategory("电子产品");
+        goods.setCategoryId(1L); // 关联品类ID
         goods.setStatus(1);
         goods.setCreateTime(new Date());
         goods.setUpdateTime(new Date());

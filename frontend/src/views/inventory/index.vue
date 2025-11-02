@@ -13,7 +13,7 @@
         style="width: 100%"
       >
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="goodsId" label="商品ID" width="100" />
+        <el-table-column prop="goodsName" label="商品" width="200" />
         <el-table-column prop="quantity" label="库存数量" width="120" />
         <el-table-column prop="warehouseName" label="仓库名称" width="150" />
         <el-table-column prop="warehouseLocation" label="仓库位置" width="200" />
@@ -30,8 +30,15 @@
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="600px">
       <el-form ref="inventoryForm" :model="inventoryForm" :rules="rules" label-width="100px">
-        <el-form-item label="商品ID" prop="goodsId">
-          <el-input-number v-model="inventoryForm.goodsId" style="width: 100%" />
+        <el-form-item label="商品" prop="goodsId">
+          <el-select v-model="inventoryForm.goodsId" placeholder="请选择商品" style="width: 100%" clearable filterable>
+            <el-option
+              v-for="item in goodsOptions"
+              :key="item.id"
+              :label="`${item.goodsCode} - ${item.goodsName}`"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="库存数量" prop="quantity">
           <el-input-number v-model="inventoryForm.quantity" style="width: 100%" />
@@ -62,6 +69,7 @@
 
 <script>
 import { getInventoryList, createInventory, updateInventory, deleteInventory } from '@/api/inventory'
+import { getGoodsList } from '@/api/goods'
 
 export default {
   name: 'Inventory',
@@ -69,6 +77,7 @@ export default {
     return {
       loading: false,
       inventoryList: [],
+      goodsOptions: [],
       dialogVisible: false,
       dialogTitle: '新增库存',
       inventoryForm: {
@@ -82,28 +91,49 @@ export default {
         remark: ''
       },
       rules: {
-        goodsId: [{ required: true, message: '请输入商品ID', trigger: 'blur' }],
+        goodsId: [{ required: true, message: '请选择商品', trigger: 'change' }],
         quantity: [{ required: true, message: '请输入库存数量', trigger: 'blur' }]
       }
     }
   },
-  mounted() {
-    this.loadInventoryList()
+  async mounted() {
+    await this.loadGoodsOptions()
+    await this.loadInventoryList()
   },
   methods: {
+    async loadGoodsOptions() {
+      try {
+        const res = await getGoodsList()
+        this.goodsOptions = res.data || []
+      } catch (error) {
+        this.$message.error('加载商品列表失败')
+      }
+    },
     async loadInventoryList() {
       this.loading = true
       try {
         const res = await getInventoryList()
-        this.inventoryList = res.data || []
+        const inventoryList = res.data || []
+        // 处理库存列表，添加商品名称显示
+        this.inventoryList = inventoryList.map(inventory => {
+          const goods = this.goodsOptions.find(g => g.id === inventory.goodsId)
+          return {
+            ...inventory,
+            goodsName: goods ? `${goods.goodsCode} - ${goods.goodsName}` : `商品ID: ${inventory.goodsId}`
+          }
+        })
       } catch (error) {
         this.$message.error('加载库存列表失败')
       } finally {
         this.loading = false
       }
     },
-    handleAdd() {
+    async handleAdd() {
       this.dialogTitle = '新增库存'
+      // 确保商品选项已加载
+      if (this.goodsOptions.length === 0) {
+        await this.loadGoodsOptions()
+      }
       this.inventoryForm = {
         id: null,
         goodsId: null,
@@ -116,8 +146,12 @@ export default {
       }
       this.dialogVisible = true
     },
-    handleEdit(row) {
+    async handleEdit(row) {
       this.dialogTitle = '编辑库存'
+      // 确保商品选项已加载
+      if (this.goodsOptions.length === 0) {
+        await this.loadGoodsOptions()
+      }
       this.inventoryForm = { ...row }
       this.dialogVisible = true
     },
@@ -133,7 +167,8 @@ export default {
               this.$message.success('创建成功')
             }
             this.dialogVisible = false
-            this.loadInventoryList()
+            await this.loadGoodsOptions()
+            await this.loadInventoryList()
           } catch (error) {
             this.$message.error('操作失败')
           }

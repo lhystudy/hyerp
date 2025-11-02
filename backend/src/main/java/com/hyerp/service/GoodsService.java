@@ -1,6 +1,8 @@
 package com.hyerp.service;
 
+import com.hyerp.dao.CategoryMapper;
 import com.hyerp.dao.GoodsMapper;
+import com.hyerp.model.Category;
 import com.hyerp.model.Goods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ public class GoodsService {
 
     @Autowired
     private GoodsMapper goodsMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     public List<Goods> getAllGoods() {
         return goodsMapper.selectAll();
@@ -31,6 +36,16 @@ public class GoodsService {
         Goods existing = goodsMapper.selectByGoodsCode(goods.getGoodsCode());
         if (existing != null) {
             throw new RuntimeException("商品编号已存在");
+        }
+        // 验证品类ID是否存在
+        if (goods.getCategoryId() != null) {
+            Category category = categoryMapper.selectByPrimaryKey(goods.getCategoryId());
+            if (category == null) {
+                throw new RuntimeException("品类不存在");
+            }
+            if (category.getStatus() != 1) {
+                throw new RuntimeException("所选品类已停用");
+            }
         }
         goods.setCreateTime(new Date());
         goods.setUpdateTime(new Date());
@@ -51,6 +66,16 @@ public class GoodsService {
             Goods codeExists = goodsMapper.selectByGoodsCode(goods.getGoodsCode());
             if (codeExists != null) {
                 throw new RuntimeException("商品编号已存在");
+            }
+        }
+        // 验证品类ID是否存在
+        if (goods.getCategoryId() != null) {
+            Category category = categoryMapper.selectByPrimaryKey(goods.getCategoryId());
+            if (category == null) {
+                throw new RuntimeException("品类不存在");
+            }
+            if (category.getStatus() != 1) {
+                throw new RuntimeException("所选品类已停用");
             }
         }
         goods.setId(id);

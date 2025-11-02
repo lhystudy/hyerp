@@ -70,6 +70,18 @@ export const constantRoutes = [
         meta: { title: '发货管理', icon: 'shipment' }
       }
     ]
+  },
+  {
+    path: '/category',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Category',
+        component: () => import('@/views/category/index'),
+        meta: { title: '品类管理', icon: 'category' }
+      }
+    ]
   }
 ]
 

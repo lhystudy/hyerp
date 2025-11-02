@@ -30,6 +30,10 @@
             <i class="el-icon-truck"></i>
             <span slot="title">发货管理</span>
           </el-menu-item>
+          <el-menu-item index="/category/index">
+            <i class="el-icon-collection-tag"></i>
+            <span slot="title">品类管理</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-container>

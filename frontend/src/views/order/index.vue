@@ -42,10 +42,10 @@
       </el-table>
     </el-card>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="700px">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
       <el-form ref="orderForm" :model="orderForm" :rules="rules" label-width="100px">
-        <el-form-item label="订单号" prop="orderNo">
-          <el-input v-model="orderForm.orderNo" />
+        <el-form-item label="订单号" prop="orderNo" v-if="orderForm.id">
+          <el-input v-model="orderForm.orderNo" :disabled="true" />
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
@@ -62,9 +62,61 @@
         <el-form-item label="客户地址" prop="customerAddress">
           <el-input v-model="orderForm.customerAddress" />
         </el-form-item>
-        <el-form-item label="总金额" prop="totalAmount">
+        
+        <!-- 订单明细 -->
+        <el-form-item label="订单明细" prop="orderItems" v-if="!orderForm.id">
+          <div style="width: 100%; border: 1px solid #DCDFE6; border-radius: 4px; padding: 10px;">
+            <div style="margin-bottom: 10px;">
+              <el-button size="small" type="primary" icon="el-icon-plus" @click="addOrderItem">添加商品</el-button>
+            </div>
+            <el-table :data="orderForm.orderItems" border size="small" style="width: 100%">
+              <el-table-column label="商品" width="250">
+                <template slot-scope="scope">
+                  <el-select v-model="scope.row.goodsId" placeholder="请选择商品" style="width: 100%" 
+                             @change="handleGoodsChange(scope.$index)" filterable>
+                    <el-option
+                      v-for="item in goodsOptions"
+                      :key="item.id"
+                      :label="`${item.goodsCode} - ${item.goodsName} (¥${item.price})`"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </template>
+              </el-table-column>
+              <el-table-column label="单价" width="120">
+                <template slot-scope="scope">
+                  <span>¥{{ scope.row.price || '0.00' }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="数量" width="120">
+                <template slot-scope="scope">
+                  <el-input-number v-model="scope.row.quantity" :min="1" :precision="0" 
+                                   style="width: 100%" @change="calculateTotal" />
+                </template>
+              </el-table-column>
+              <el-table-column label="小计" width="120">
+                <template slot-scope="scope">
+                  <span>¥{{ (scope.row.price * scope.row.quantity || 0).toFixed(2) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="80">
+                <template slot-scope="scope">
+                  <el-button size="mini" type="danger" icon="el-icon-delete" 
+                             @click="removeOrderItem(scope.$index)"></el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div style="margin-top: 10px; text-align: right; padding-right: 10px;">
+              <strong>总金额：¥{{ orderForm.totalAmount.toFixed(2) }}</strong>
+            </div>
+          </div>
+        </el-form-item>
+        
+        <!-- 编辑模式显示总金额 -->
+        <el-form-item label="总金额" prop="totalAmount" v-if="orderForm.id">
           <el-input-number v-model="orderForm.totalAmount" :precision="2" :step="0.1" style="width: 100%" />
         </el-form-item>
+        
         <el-form-item label="状态" prop="status">
           <el-select v-model="orderForm.status" style="width: 100%">
             <el-option label="待处理" :value="0" />
@@ -88,6 +140,7 @@
 
 <script>
 import { getOrderList, createOrder, updateOrder, deleteOrder } from '@/api/order'
+import { getGoodsList } from '@/api/goods'
 
 export default {
   name: 'Order',
@@ -95,6 +148,7 @@ export default {
     return {
       loading: false,
       orderList: [],
+      goodsOptions: [],
       dialogVisible: false,
       dialogTitle: '新增订单',
       orderForm: {
@@ -105,19 +159,39 @@ export default {
         customerAddress: '',
         totalAmount: 0,
         status: 0,
-        remark: ''
+        remark: '',
+        orderItems: []
       },
       rules: {
-        orderNo: [{ required: true, message: '请输入订单号', trigger: 'blur' }],
         customerName: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
-        totalAmount: [{ required: true, message: '请输入总金额', trigger: 'blur' }]
+        orderItems: [
+          { 
+            validator: (rule, value, callback) => {
+              if (!this.orderForm.id && (!value || value.length === 0)) {
+                callback(new Error('请至少添加一个商品'))
+              } else {
+                callback()
+              }
+            }, 
+            trigger: 'change' 
+          }
+        ]
       }
     }
   },
-  mounted() {
-    this.loadOrderList()
+  async mounted() {
+    await this.loadGoodsOptions()
+    await this.loadOrderList()
   },
   methods: {
+    async loadGoodsOptions() {
+      try {
+        const res = await getGoodsList()
+        this.goodsOptions = res.data || []
+      } catch (error) {
+        this.$message.error('加载商品列表失败')
+      }
+    },
     async loadOrderList() {
       this.loading = true
       try {
@@ -129,6 +203,36 @@ export default {
         this.loading = false
       }
     },
+    addOrderItem() {
+      this.orderForm.orderItems.push({
+        goodsId: null,
+        quantity: 1,
+        price: 0
+      })
+    },
+    removeOrderItem(index) {
+      this.orderForm.orderItems.splice(index, 1)
+      this.calculateTotal()
+    },
+    handleGoodsChange(index) {
+      const item = this.orderForm.orderItems[index]
+      if (item.goodsId) {
+        const goods = this.goodsOptions.find(g => g.id === item.goodsId)
+        if (goods) {
+          item.price = parseFloat(goods.price)
+          this.calculateTotal()
+        }
+      }
+    },
+    calculateTotal() {
+      let total = 0
+      this.orderForm.orderItems.forEach(item => {
+        if (item.price && item.quantity) {
+          total += item.price * item.quantity
+        }
+      })
+      this.orderForm.totalAmount = total
+    },
     handleAdd() {
       this.dialogTitle = '新增订单'
       this.orderForm = {
@@ -139,7 +243,8 @@ export default {
         customerAddress: '',
         totalAmount: 0,
         status: 0,
-        remark: ''
+        remark: '',
+        orderItems: []
       }
       this.dialogVisible = true
     },
@@ -153,16 +258,27 @@ export default {
         if (valid) {
           try {
             if (this.orderForm.id) {
-              await updateOrder(this.orderForm.id, this.orderForm)
+              // 编辑订单
+              const { orderItems, ...orderData } = this.orderForm
+              await updateOrder(this.orderForm.id, orderData)
               this.$message.success('更新成功')
             } else {
-              await createOrder(this.orderForm)
+              // 新增订单，需要包含订单明细
+              const submitData = {
+                ...this.orderForm,
+                orderItems: this.orderForm.orderItems.map(item => ({
+                  goodsId: item.goodsId,
+                  quantity: item.quantity,
+                  price: item.price
+                }))
+              }
+              await createOrder(submitData)
               this.$message.success('创建成功')
             }
             this.dialogVisible = false
-            this.loadOrderList()
+            await this.loadOrderList()
           } catch (error) {
-            this.$message.error('操作失败')
+            this.$message.error(error.message || '操作失败')
           }
         }
       })

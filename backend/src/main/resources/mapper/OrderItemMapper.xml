@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyerp.dao.OrderItemMapper">
+    <resultMap id="BaseResultMap" type="com.hyerp.model.OrderItem">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="order_id" jdbcType="BIGINT" property="orderId" />
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+        <result column="quantity" jdbcType="INTEGER" property="quantity" />
+        <result column="price" jdbcType="DECIMAL" property="price" />
+        <result column="subtotal" jdbcType="DECIMAL" property="subtotal" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    
+    <sql id="BaseColumnList">
+        `id`, `order_id`, `goods_id`, `quantity`, `price`, `subtotal`, 
+        `create_time`, `update_time`
+    </sql>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.hyerp.model.OrderItem" useGeneratedKeys="true">
+        INSERT INTO order_item (
+            `order_id`, `goods_id`, `quantity`, `price`, `subtotal`, 
+            `create_time`, `update_time`
+        ) VALUES (
+            #{orderId}, #{goodsId}, #{quantity}, #{price}, #{subtotal},
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO order_item (
+            `order_id`, `goods_id`, `quantity`, `price`, `subtotal`, 
+            `create_time`, `update_time`
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.orderId}, #{item.goodsId}, #{item.quantity}, #{item.price}, #{item.subtotal},
+            #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyerp.model.OrderItem">
+        UPDATE order_item
+        SET 
+            `order_id` = #{orderId},
+            `goods_id` = #{goodsId},
+            `quantity` = #{quantity},
+            `price` = #{price},
+            `subtotal` = #{subtotal},
+            `update_time` = #{updateTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM order_item WHERE `id` = #{id}
+    </delete>
+
+    <delete id="deleteByOrderId" parameterType="java.lang.Long">
+        DELETE FROM order_item WHERE `order_id` = #{orderId}
+    </delete>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM order_item
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM order_item
+        ORDER BY `create_time` DESC
+    </select>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM order_item
+        WHERE `order_id` = #{orderId}
+        ORDER BY `create_time` ASC
+    </select>
+</mapper>
+
