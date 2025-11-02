@@ -25,7 +25,7 @@ spring:
       pool:
         size: 10
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/trade_sys?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://127.0.0.1:3306/hyerp?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyerp.dao.ShipmentMapper">
+    <resultMap id="BaseResultMap" type="com.hyerp.model.Shipment">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="order_id" jdbcType="BIGINT" property="orderId" />
+        <result column="shipment_no" jdbcType="VARCHAR" property="shipmentNo" />
+        <result column="shipper_name" jdbcType="VARCHAR" property="shipperName" />
+        <result column="shipper_phone" jdbcType="VARCHAR" property="shipperPhone" />
+        <result column="shipping_address" jdbcType="VARCHAR" property="shippingAddress" />
+        <result column="receiver_name" jdbcType="VARCHAR" property="receiverName" />
+        <result column="receiver_phone" jdbcType="VARCHAR" property="receiverPhone" />
+        <result column="receiver_address" jdbcType="VARCHAR" property="receiverAddress" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="ship_date" jdbcType="TIMESTAMP" property="shipDate" />
+        <result column="expected_delivery_date" jdbcType="TIMESTAMP" property="expectedDeliveryDate" />
+        <result column="actual_delivery_date" jdbcType="TIMESTAMP" property="actualDeliveryDate" />
+        <result column="tracking_number" jdbcType="VARCHAR" property="trackingNumber" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    
+    <sql id="BaseColumnList">
+        `id`, `order_id`, `shipment_no`, `shipper_name`, `shipper_phone`, `shipping_address`,
+        `receiver_name`, `receiver_phone`, `receiver_address`, `status`, `ship_date`,
+        `expected_delivery_date`, `actual_delivery_date`, `tracking_number`, `remark`,
+        `create_time`, `update_time`
+    </sql>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.hyerp.model.Shipment" useGeneratedKeys="true">
+        INSERT INTO shipment (
+            `order_id`, `shipment_no`, `shipper_name`, `shipper_phone`, `shipping_address`,
+            `receiver_name`, `receiver_phone`, `receiver_address`, `status`, `ship_date`,
+            `expected_delivery_date`, `actual_delivery_date`, `tracking_number`, `remark`,
+            `create_time`, `update_time`
+        ) VALUES (
+            #{orderId}, #{shipmentNo}, #{shipperName}, #{shipperPhone}, #{shippingAddress},
+            #{receiverName}, #{receiverPhone}, #{receiverAddress}, #{status}, #{shipDate},
+            #{expectedDeliveryDate}, #{actualDeliveryDate}, #{trackingNumber}, #{remark},
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyerp.model.Shipment">
+        UPDATE shipment
+        SET 
+            `order_id` = #{orderId},
+            `shipment_no` = #{shipmentNo},
+            `shipper_name` = #{shipperName},
+            `shipper_phone` = #{shipperPhone},
+            `shipping_address` = #{shippingAddress},
+            `receiver_name` = #{receiverName},
+            `receiver_phone` = #{receiverPhone},
+            `receiver_address` = #{receiverAddress},
+            `status` = #{status},
+            `ship_date` = #{shipDate},
+            `expected_delivery_date` = #{expectedDeliveryDate},
+            `actual_delivery_date` = #{actualDeliveryDate},
+            `tracking_number` = #{trackingNumber},
+            `remark` = #{remark},
+            `update_time` = #{updateTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM shipment WHERE `id` = #{id}
+    </delete>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM shipment
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM shipment
+        ORDER BY `create_time` DESC
+    </select>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM shipment
+        WHERE `order_id` = #{orderId}
+        ORDER BY `create_time` DESC
+    </select>
+</mapper>
+

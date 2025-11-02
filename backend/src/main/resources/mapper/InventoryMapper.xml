@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyerp.dao.InventoryMapper">
+    <resultMap id="BaseResultMap" type="com.hyerp.model.Inventory">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+        <result column="quantity" jdbcType="INTEGER" property="quantity" />
+        <result column="warehouse_name" jdbcType="VARCHAR" property="warehouseName" />
+        <result column="warehouse_location" jdbcType="VARCHAR" property="warehouseLocation" />
+        <result column="min_stock" jdbcType="INTEGER" property="minStock" />
+        <result column="max_stock" jdbcType="INTEGER" property="maxStock" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    
+    <sql id="BaseColumnList">
+        `id`, `goods_id`, `quantity`, `warehouse_name`, `warehouse_location`, 
+        `min_stock`, `max_stock`, `remark`, `create_time`, `update_time`
+    </sql>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.hyerp.model.Inventory" useGeneratedKeys="true">
+        INSERT INTO inventory (
+            `goods_id`, `quantity`, `warehouse_name`, `warehouse_location`, 
+            `min_stock`, `max_stock`, `remark`, `create_time`, `update_time`
+        ) VALUES (
+            #{goodsId}, #{quantity}, #{warehouseName}, #{warehouseLocation},
+            #{minStock}, #{maxStock}, #{remark}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyerp.model.Inventory">
+        UPDATE inventory
+        SET 
+            `goods_id` = #{goodsId},
+            `quantity` = #{quantity},
+            `warehouse_name` = #{warehouseName},
+            `warehouse_location` = #{warehouseLocation},
+            `min_stock` = #{minStock},
+            `max_stock` = #{maxStock},
+            `remark` = #{remark},
+            `update_time` = #{updateTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM inventory WHERE `id` = #{id}
+    </delete>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM inventory
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM inventory
+        ORDER BY `create_time` DESC
+    </select>
+
+    <select id="selectByGoodsId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM inventory
+        WHERE `goods_id` = #{goodsId}
+        ORDER BY `create_time` DESC
+    </select>
+</mapper>
+
