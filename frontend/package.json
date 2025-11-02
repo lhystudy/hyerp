@@ -1,0 +1,25 @@
+{
+  "name": "hyerp-frontend",
+  "version": "1.0.0",
+  "description": "ERP系统前端",
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "vue": "^2.6.14",
+    "vue-router": "^3.5.4",
+    "vuex": "^3.6.2",
+    "axios": "^0.27.2",
+    "element-ui": "^2.15.13"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^5.0.8",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "vue-template-compiler": "^2.6.14",
+    "sass": "^1.32.13",
+    "sass-loader": "^10.2.0"
+  }
+}
+

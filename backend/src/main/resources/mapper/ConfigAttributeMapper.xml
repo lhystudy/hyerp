@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyerp.dao.ConfigAttributeMapper">
+    <resultMap id="BaseResultMap" type="com.hyerp.model.ConfigAttribute">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="inst_id" jdbcType="VARCHAR" property="instId" />
+        <result column="config_name" jdbcType="VARCHAR" property="configName" />
+        <result column="config_value" jdbcType="VARCHAR" property="configValue" />
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    </resultMap>
+    <sql id="BaseColumnList">
+        `id`,
+        `inst_id`,
+        `config_name`,
+        `config_value`,
+        `created_at`,
+        `updated_at`
+    </sql>
+
+    <!--有则更新，无则插入-->
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.hyerp.model.ConfigAttribute" useGeneratedKeys="true">
+        INSERT INTO config_attribute (
+            `id`,
+            `inst_id`,
+            `config_name`,
+            `config_value`,
+            `created_at`,
+            `updated_at`
+        ) VALUES (
+             #{id},
+             #{instId},
+             #{configName},
+             #{configValue},
+             #{createdAt},
+             #{updatedAt}
+        );
+    </insert>
+
+    <select id="getAttrById" resultMap="BaseResultMap" >
+        select
+        <include refid="BaseColumnList"/>
+        from config_attribute
+        where id = #{id}
+    </select>
+
+    <select id="getAttrByInstIdAndName" resultMap="BaseResultMap" >
+        select
+        <include refid="BaseColumnList"/>
+        from config_attribute
+        where inst_id = #{instId}
+        and config_name = #{configName}
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyerp.model.ConfigAttribute">
+        UPDATE config_attribute
+        SET
+            inst_id = #{instId},
+            config_name = #{configName},
+            config_value = #{configValue},
+            updated_at = #{updatedAt}
+        WHERE
+            id = #{id}
+    </update>
+
+    <select id="getAllAttr" resultMap="BaseResultMap" >
+        select
+        <include refid="BaseColumnList"/>
+        from config_attribute
+    </select>
+
+    <delete id="delete" parameterType="INTEGER">
+        DELETE FROM config_attribute WHERE id = #{id};
+    </delete>
+</mapper>
