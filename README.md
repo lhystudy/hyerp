@@ -1,6 +1,6 @@
 # HyErp - 电商ERP管理系统
 
-这是一个前后端分离的电商ERP管理系统项目，适合初学者学习和使用。前端使用Vue + Element UI构建用户界面，后端使用Spring Boot + MyBatis处理业务逻辑。
+这是一个前后端分离的电商ERP管理系统项目。前端使用Vue + Element UI构建用户界面，后端使用Spring Boot + MyBatis处理业务逻辑。
 
 ## 📋 目录
 
@@ -134,19 +134,15 @@ HyErp/
 ### 必需软件
 
 1. **JDK 1.8** 或更高版本
-   - 下载地址：https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html
    - 验证安装：在命令行运行 `java -version`
 
 2. **Maven 3.6+**
-   - 下载地址：https://maven.apache.org/download.cgi
    - 验证安装：在命令行运行 `mvn -version`
 
 3. **MySQL 8.0**
-   - 下载地址：https://dev.mysql.com/downloads/mysql/
    - 确保MySQL服务正在运行
 
 4. **Node.js 14+** 和 **npm 6+**
-   - 下载地址：https://nodejs.org/
    - 验证安装：在命令行运行 `node -v` 和 `npm -v`
 
 5. **IDE（推荐）**
@@ -187,125 +183,10 @@ datasource:
 
 执行 `backend/src/main/resources/db/` 目录下的SQL脚本：
 
-- `user_table.sql` - 用户表（包含默认管理员账号：admin/admin）
-- `category_table.sql` - 品类表
-- `order_item_table.sql` - 订单明细表
+- `hyerp.sql` - 建库脚本
 
-或者参考下面的完整建表SQL：
 
-```sql
--- 用户表
-CREATE TABLE user (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
-    password VARCHAR(100) NOT NULL COMMENT '密码',
-    real_name VARCHAR(100) COMMENT '真实姓名',
-    email VARCHAR(100) COMMENT '邮箱',
-    phone VARCHAR(20) COMMENT '电话',
-    status INT NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间',
-    INDEX idx_username(username)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
-
--- 插入默认管理员用户（用户名：admin，密码：admin）
-INSERT INTO user (username, password, real_name, status, create_time, update_time)
-VALUES ('admin', 'admin', '管理员', 1, NOW(), NOW());
-
--- 品类表
-CREATE TABLE category (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    category_code VARCHAR(100) NOT NULL UNIQUE COMMENT '品类编码',
-    category_name VARCHAR(200) NOT NULL COMMENT '品类名称',
-    description VARCHAR(500) COMMENT '描述',
-    status INT NOT NULL DEFAULT 1 COMMENT '状态 0-停用 1-启用',
-    sort_order INT DEFAULT 0 COMMENT '排序',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间',
-    INDEX idx_category_code(category_code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='品类表';
-
--- 商品表
-CREATE TABLE goods (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    goods_code VARCHAR(100) NOT NULL UNIQUE COMMENT '商品编号',
-    goods_name VARCHAR(200) NOT NULL COMMENT '商品名称',
-    description VARCHAR(500) COMMENT '描述',
-    price DECIMAL(10,2) NOT NULL COMMENT '价格',
-    unit VARCHAR(50) COMMENT '单位',
-    category_id BIGINT COMMENT '品类ID，关联category表',
-    status INT NOT NULL DEFAULT 1 COMMENT '状态 0-停用 1-启用',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
-
--- 订单表
-CREATE TABLE `order` (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    order_no VARCHAR(50) NOT NULL UNIQUE COMMENT '订单号',
-    customer_name VARCHAR(100) COMMENT '客户名称',
-    customer_phone VARCHAR(20) COMMENT '客户电话',
-    customer_address VARCHAR(500) COMMENT '客户地址',
-    total_amount DECIMAL(10,2) NOT NULL COMMENT '总金额',
-    status INT NOT NULL DEFAULT 0 COMMENT '状态 0-待处理 1-已确认 2-已预定 3-已发货 4-已完成 5-已取消',
-    order_date DATETIME NOT NULL COMMENT '订单日期',
-    delivery_date DATETIME COMMENT '配送日期',
-    remark VARCHAR(500) COMMENT '备注',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
-
--- 订单明细表
-CREATE TABLE order_item (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    order_id BIGINT NOT NULL COMMENT '订单ID',
-    goods_id BIGINT NOT NULL COMMENT '商品ID',
-    quantity INT NOT NULL COMMENT '商品数量',
-    price DECIMAL(10,2) NOT NULL COMMENT '单价（下单时的商品价格）',
-    subtotal DECIMAL(10,2) NOT NULL COMMENT '小计（price * quantity）',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间',
-    INDEX idx_order_id(order_id),
-    INDEX idx_goods_id(goods_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单明细表';
-
--- 库存表
-CREATE TABLE inventory (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    goods_id BIGINT NOT NULL COMMENT '商品ID',
-    quantity INT NOT NULL COMMENT '库存数量',
-    warehouse_name VARCHAR(100) COMMENT '仓库名称',
-    warehouse_location VARCHAR(200) COMMENT '仓库位置',
-    min_stock INT COMMENT '最小库存',
-    max_stock INT COMMENT '最大库存',
-    remark VARCHAR(500) COMMENT '备注',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='库存表';
-
--- 发货表
-CREATE TABLE shipment (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    order_id BIGINT NOT NULL COMMENT '订单ID',
-    shipment_no VARCHAR(50) NOT NULL UNIQUE COMMENT '发货单号',
-    shipper_name VARCHAR(100) COMMENT '发货人姓名',
-    shipper_phone VARCHAR(20) COMMENT '发货人电话',
-    shipping_address VARCHAR(500) COMMENT '发货地址',
-    receiver_name VARCHAR(100) COMMENT '收货人姓名',
-    receiver_phone VARCHAR(20) COMMENT '收货人电话',
-    receiver_address VARCHAR(500) COMMENT '收货地址',
-    status INT NOT NULL DEFAULT 0 COMMENT '状态 0-待发货 1-已发货 2-运输中 3-已送达 4-异常',
-    ship_date DATETIME COMMENT '发货日期',
-    expected_delivery_date DATETIME COMMENT '预计送达日期',
-    actual_delivery_date DATETIME COMMENT '实际送达日期',
-    tracking_number VARCHAR(100) COMMENT '物流单号',
-    remark VARCHAR(500) COMMENT '备注',
-    create_time DATETIME NOT NULL COMMENT '创建时间',
-    update_time DATETIME COMMENT '更新时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='发货表';
-```
-
-### 第三步：启动后端服务
+### 第三步：启动后端服务（可直接在idea中打开backend目录并运行本项目，无需按命令行执行）
 
 1. **进入后端目录**
 
@@ -555,27 +436,16 @@ npm run dev
    - 查看Network面板检查API请求
    - 查看Console面板查看错误信息
 
-## 📝 更新日志
-
-### v1.0.0 (当前版本)
-
-- ✅ 用户登录/登出功能
-- ✅ 路由守卫保护
-- ✅ 商品管理功能
-- ✅ 订单管理功能（含订单确认）
-- ✅ 库存管理功能
-- ✅ 发货管理功能（优化：仅显示已预定订单，自动填充收货信息）
-- ✅ 品类管理功能
-- ✅ Swagger API文档集成
 
 ## 📄 License
 
 MIT License
 
-## 👥 贡献
-
-欢迎提交Issue和Pull Request！
-
----
-
-**提示**：如果您是编程初学者，建议先熟悉Vue和Spring Boot的基础知识，然后再开始使用本项目。遇到问题可以查看常见问题部分，或提交Issue寻求帮助。
+## 常用命令
+### java 打包命令
+```mvn clean package -DskipTests```
+### 前端相关命令
+#### 测试运行
+```npm run dev```
+#### 打包命令，打包后输出的文件在./dist目录下
+```npm run build```
