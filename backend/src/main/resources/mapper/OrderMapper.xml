@@ -15,6 +15,17 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     </resultMap>
+
+    <resultMap id="OrderReservedItemMap" type="com.hyerp.model.dtpojo.ReservedItemPojo">
+        <result column="order_id" jdbcType="BIGINT" property="orderId" />
+        <result column="item_id" jdbcType="BIGINT" property="itemId" />
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+        <result column="order_quantity" jdbcType="INTEGER" property="orderQuantity" />
+        <result column="reserved_id" jdbcType="BIGINT" property="reservedId" />
+        <result column="inventory_id" jdbcType="BIGINT" property="inventoryId" />
+        <result column="reserved_quantity" jdbcType="INTEGER" property="reservedQuantity" />
+        <result column="needed_quantity" jdbcType="INTEGER" property="neededQuantity" />
+    </resultMap>
     
     <sql id="BaseColumnList">
         `id`, `order_no`, `customer_name`, `customer_phone`, `customer_address`, 
@@ -68,11 +79,36 @@
         ORDER BY `create_time` DESC
     </select>
 
+    <select id="selectNeedReserved" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM `order`
+        where `STATUS` = '1'
+        ORDER BY `create_time` DESC
+    </select>
+
     <select id="selectByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
         SELECT
         <include refid="BaseColumnList"/>
         FROM `order`
         WHERE `order_no` = #{orderNo}
+    </select>
+
+    <select id="selectOrderReservedItem" resultMap="OrderReservedItemMap" parameterType="java.lang.Long">
+        SELECT
+            o.id as order_id,
+            oi.id as item_id,
+            oi.goods_id,
+            oi.quantity as order_quantity,
+            oir.id as reserved_id,
+            oir.inventory_id,
+            oir.reserved_quantity,
+            oir.needed_quantity
+        from `order` o
+            INNER join order_item oi on o.id = oi.order_id
+            LEFT JOIN order_item_reserved oir on oi.id = oir.item_id
+        WHERE
+            o.id = #{orderId}
     </select>
 </mapper>
 

@@ -1,6 +1,8 @@
 package com.hyerp.dao;
 
+import com.hyerp.job.ReserveOrderJob;
 import com.hyerp.model.Order;
+import com.hyerp.model.dtpojo.ReservedItemPojo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -13,5 +15,8 @@ public interface OrderMapper {
     Order selectByPrimaryKey(Long id);
     List<Order> selectAll();
     Order selectByOrderNo(String orderNo);
+    List<Order> selectNeedReserved();
+
+    List<ReservedItemPojo> selectOrderReservedItem(Long orderId);
 }
 

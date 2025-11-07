@@ -40,9 +40,9 @@ public class InventoryController {
     }
 
     @GetMapping("/goods/{goodsId}")
-    public Result<List<Inventory>> getInventoryByGoodsId(@PathVariable Long goodsId) {
+    public Result<Inventory> getInventoryByGoodsId(@PathVariable Long goodsId) {
         try {
-            List<Inventory> inventoryList = inventoryService.getInventoriesByGoodsId(goodsId);
+            Inventory inventoryList = inventoryService.getInventoriesByGoodsId(goodsId);
             return Result.success(inventoryList);
         } catch (Exception e) {
             return Result.error(e.getMessage());

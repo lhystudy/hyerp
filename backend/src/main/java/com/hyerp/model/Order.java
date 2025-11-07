@@ -22,7 +22,7 @@ public class Order {
     private String customerPhone;
     private String customerAddress;
     private BigDecimal totalAmount;
-    private Integer status; // 0-待处理 1-已确认 2-已发货 3-已完成 4-已取消
+    private Integer status; // 0-待处理 1-已确认 2-已预定 3-已发货 4-已完成 5-已取消
     private Date orderDate;
     private Date deliveryDate;
     private String remark;

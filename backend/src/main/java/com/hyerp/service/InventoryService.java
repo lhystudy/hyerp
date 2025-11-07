@@ -22,7 +22,7 @@ public class InventoryService {
         return inventoryMapper.selectByPrimaryKey(id);
     }
 
-    public List<Inventory> getInventoriesByGoodsId(Long goodsId) {
+    public Inventory getInventoriesByGoodsId(Long goodsId) {
         return inventoryMapper.selectByGoodsId(goodsId);
     }
 

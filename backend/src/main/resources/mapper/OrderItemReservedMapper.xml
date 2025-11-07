@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyerp.dao.OrderItemReservedMapper">
+    <resultMap id="BaseResultMap" type="com.hyerp.model.OrderItemReserved">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="item_id" jdbcType="BIGINT" property="itemId" />
+        <result column="inventory_id" jdbcType="BIGINT" property="inventoryId" />
+        <result column="reserved_quantity" jdbcType="INTEGER" property="reservedQuantity" />
+        <result column="needed_quantity" jdbcType="INTEGER" property="neededQuantity" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    
+    <sql id="BaseColumnList">
+        `id`, `item_id`, `inventory_id`, `reserved_quantity`, `needed_quantity`,
+        `create_time`, `update_time`
+    </sql>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.hyerp.model.OrderItemReserved" useGeneratedKeys="true">
+        INSERT INTO order_item_reserved (
+            `item_id`, `inventory_id`, `reserved_quantity`, `needed_quantity`,
+            `create_time`, `update_time`
+        ) VALUES (
+             #{itemId}, #{inventoryId}, #{reservedQuantity}, #{neededQuantity},
+             #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO order_item_reserved (
+        `item_id`, `inventory_id`, `reserved_quantity`, `needed_quantity`,
+        `create_time`, `update_time`
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.itemId}, #{item.inventoryId}, #{item.reservedQuantity}, #{item.neededQuantity},
+            #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyerp.model.OrderItemReserved">
+        UPDATE order_item_reserved
+        SET 
+            `item_id` = #{itemId},
+            `inventory_id` = #{inventoryId},
+            `reserved_quantity` = #{reservedQuantity},
+            `needed_quantity` = #{neededQuantity},
+            `create_time` = #{createTime},
+            `update_time` = #{updateTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM order_item_reserved WHERE `id` = #{id}
+    </delete>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM order_item_reserved
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM order_item_reserved
+        ORDER BY `create_time` DESC
+    </select>
+
+
+</mapper>
+

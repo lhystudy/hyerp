@@ -12,6 +12,6 @@ public interface InventoryMapper {
     int deleteByPrimaryKey(Long id);
     Inventory selectByPrimaryKey(Long id);
     List<Inventory> selectAll();
-    List<Inventory> selectByGoodsId(Long goodsId);
+    Inventory selectByGoodsId(Long goodsId);
 }
 

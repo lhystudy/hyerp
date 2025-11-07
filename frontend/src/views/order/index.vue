@@ -118,12 +118,16 @@
         </el-form-item>
         
         <el-form-item label="状态" prop="status">
-          <el-select v-model="orderForm.status" style="width: 100%">
+          <el-select 
+            v-model="orderForm.status" 
+            :disabled="orderForm.id ? false : true"
+            style="width: 100%">
             <el-option label="待处理" :value="0" />
             <el-option label="已确认" :value="1" />
-            <el-option label="已发货" :value="2" />
-            <el-option label="已完成" :value="3" />
-            <el-option label="已取消" :value="4" />
+            <el-option label="已预定" :value="2" />
+            <el-option label="已发货" :value="3" />
+            <el-option label="已完成" :value="4" />
+            <el-option label="已取消" :value="5" />
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -302,9 +306,10 @@ export default {
       const statusMap = {
         0: '待处理',
         1: '已确认',
-        2: '已发货',
-        3: '已完成',
-        4: '已取消'
+        2: '已预定',
+        3: '已发货',
+        4: '已完成',
+        5: '已取消'
       }
       return statusMap[status] || '未知'
     },
