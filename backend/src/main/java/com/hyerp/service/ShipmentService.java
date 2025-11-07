@@ -1,9 +1,12 @@
 package com.hyerp.service;
 
+import com.hyerp.dao.OrderMapper;
 import com.hyerp.dao.ShipmentMapper;
+import com.hyerp.model.Order;
 import com.hyerp.model.Shipment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +17,9 @@ public class ShipmentService {
 
     @Autowired
     private ShipmentMapper shipmentMapper;
+
+    @Autowired
+    OrderMapper orderMapper;
 
     public List<Shipment> getAllShipments() {
         return shipmentMapper.selectAll();
@@ -27,6 +33,7 @@ public class ShipmentService {
         return shipmentMapper.selectByOrderId(orderId);
     }
 
+    @Transactional
     public Shipment createShipment(Shipment shipment) {
         // 生成发货单号
         if (shipment.getShipmentNo() == null || shipment.getShipmentNo().isEmpty()) {
@@ -38,6 +45,9 @@ public class ShipmentService {
         shipment.setCreateTime(new Date());
         shipment.setUpdateTime(new Date());
         shipmentMapper.insert(shipment);
+        Order order = orderMapper.selectByPrimaryKey(shipment.getOrderId());
+        order.setStatus(3);
+        orderMapper.updateByPrimaryKey(order);
         return shipment;
     }
 
