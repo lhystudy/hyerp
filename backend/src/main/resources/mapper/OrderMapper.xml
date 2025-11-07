@@ -94,6 +94,14 @@
         WHERE `order_no` = #{orderNo}
     </select>
 
+    <select id="selectByStatus" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM `order`
+        WHERE `status` = #{status}
+        ORDER BY `create_time` DESC
+    </select>
+
     <select id="selectOrderReservedItem" resultMap="OrderReservedItemMap" parameterType="java.lang.Long">
         SELECT
             o.id as order_id,

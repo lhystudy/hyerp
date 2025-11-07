@@ -40,6 +40,9 @@
         <el-header>
           <div class="header-content">
             <h2>ERP管理系统</h2>
+            <div class="header-right">
+              <el-button type="text" @click="handleLogout" icon="el-icon-switch-button">登出</el-button>
+            </div>
           </div>
         </el-header>
         <el-main>
@@ -51,6 +54,8 @@
 </template>
 
 <script>
+import { logout } from '@/api/auth'
+
 export default {
   name: 'Layout',
   computed: {
@@ -61,6 +66,26 @@ export default {
         return meta.activeMenu
       }
       return path
+    }
+  },
+  methods: {
+    async handleLogout() {
+      this.$confirm('确定要退出登录吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await logout()
+        } catch (error) {
+          // 即使后端登出失败，也清除本地token
+        } finally {
+          // 清除token并跳转到登录页
+          this.$store.dispatch('removeToken')
+          this.$router.push('/login')
+          this.$message.success('已退出登录')
+        }
+      })
     }
   }
 }
@@ -87,10 +112,19 @@ export default {
   
   .header-content {
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
     h2 {
       margin: 0;
       font-size: 20px;
       color: #303133;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
     }
   }
 }

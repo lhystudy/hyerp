@@ -92,5 +92,28 @@ const createRouter = () => new Router({
 
 const router = createRouter()
 
+// 路由守卫：检查登录状态
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  
+  // 如果访问登录页，直接放行
+  if (to.path === '/login') {
+    // 如果已登录，跳转到首页
+    if (token) {
+      next('/')
+    } else {
+      next()
+    }
+  } else {
+    // 访问其他页面，检查是否已登录
+    if (token) {
+      next()
+    } else {
+      // 未登录，跳转到登录页
+      next('/login')
+    }
+  }
+})
+
 export default router
 

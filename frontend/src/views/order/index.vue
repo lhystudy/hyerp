@@ -33,9 +33,11 @@
             {{ formatDate(scope.row.orderDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="success" @click="handleConfirm(scope.row)" 
+                       :disabled="scope.row.status !== 0">确认</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -143,7 +145,7 @@
 </template>
 
 <script>
-import { getOrderList, createOrder, updateOrder, deleteOrder } from '@/api/order'
+import { getOrderList, createOrder, updateOrder, deleteOrder, confirmOrder } from '@/api/order'
 import { getGoodsList } from '@/api/goods'
 
 export default {
@@ -284,6 +286,21 @@ export default {
           } catch (error) {
             this.$message.error(error.message || '操作失败')
           }
+        }
+      })
+    },
+    async handleConfirm(row) {
+      this.$confirm('确定要确认该订单吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await confirmOrder(row.id)
+          this.$message.success('订单确认成功')
+          this.loadOrderList()
+        } catch (error) {
+          this.$message.error('订单确认失败')
         }
       })
     },

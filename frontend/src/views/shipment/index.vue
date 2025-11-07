@@ -41,8 +41,19 @@
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="800px">
       <el-form ref="shipmentForm" :model="shipmentForm" :rules="rules" label-width="120px">
-        <el-form-item label="订单ID" prop="orderId">
-          <el-input-number v-model="shipmentForm.orderId" style="width: 100%" />
+        <el-form-item label="订单" prop="orderId" v-if="!shipmentForm.id">
+          <el-select v-model="shipmentForm.orderId" placeholder="请选择订单" style="width: 100%" 
+                     @change="handleOrderChange" filterable>
+            <el-option
+              v-for="order in reservedOrders"
+              :key="order.id"
+              :label="`${order.orderNo} - ${order.customerName}`"
+              :value="order.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="订单ID" prop="orderId" v-else>
+          <el-input-number v-model="shipmentForm.orderId" style="width: 100%" :disabled="true" />
         </el-form-item>
         <el-form-item label="发货单号" prop="shipmentNo">
           <el-input v-model="shipmentForm.shipmentNo" />
@@ -103,6 +114,7 @@
 
 <script>
 import { getShipmentList, createShipment, updateShipment, deleteShipment } from '@/api/shipment'
+import { getOrderList, getOrder } from '@/api/order'
 
 export default {
   name: 'Shipment',
@@ -110,15 +122,16 @@ export default {
     return {
       loading: false,
       shipmentList: [],
+      reservedOrders: [], // 已预定的订单列表
       dialogVisible: false,
       dialogTitle: '新增发货',
       shipmentForm: {
         id: null,
         orderId: null,
         shipmentNo: '',
-        shipperName: '',
-        shipperPhone: '',
-        shippingAddress: '',
+        shipperName: '上海浦东发货仓',
+        shipperPhone: '11111',
+        shippingAddress: '上海浦东新区8888号',
         receiverName: '',
         receiverPhone: '',
         receiverAddress: '',
@@ -127,15 +140,25 @@ export default {
         remark: ''
       },
       rules: {
-        orderId: [{ required: true, message: '请输入订单ID', trigger: 'blur' }],
+        orderId: [{ required: true, message: '请选择订单', trigger: 'change' }],
         shipmentNo: [{ required: true, message: '请输入发货单号', trigger: 'blur' }]
       }
     }
   },
-  mounted() {
-    this.loadShipmentList()
+  async mounted() {
+    await this.loadReservedOrders()
+    await this.loadShipmentList()
   },
   methods: {
+    async loadReservedOrders() {
+      try {
+        // 获取状态为已预定（status=2）的订单
+        const res = await getOrderList({ status: 2 })
+        this.reservedOrders = res.data || []
+      } catch (error) {
+        this.$message.error('加载已预定订单列表失败')
+      }
+    },
     async loadShipmentList() {
       this.loading = true
       try {
@@ -147,15 +170,31 @@ export default {
         this.loading = false
       }
     },
+    async handleOrderChange(orderId) {
+      if (orderId) {
+        try {
+          // 根据订单ID获取订单详情，自动填充收货人信息
+          const res = await getOrder(orderId)
+          if (res.data) {
+            const order = res.data
+            this.shipmentForm.receiverName = order.customerName || ''
+            this.shipmentForm.receiverPhone = order.customerPhone || ''
+            this.shipmentForm.receiverAddress = order.customerAddress || ''
+          }
+        } catch (error) {
+          this.$message.error('获取订单信息失败')
+        }
+      }
+    },
     handleAdd() {
       this.dialogTitle = '新增发货'
       this.shipmentForm = {
         id: null,
         orderId: null,
         shipmentNo: '',
-        shipperName: '',
-        shipperPhone: '',
-        shippingAddress: '',
+        shipperName: '上海浦东发货仓',
+        shipperPhone: '11111',
+        shippingAddress: '上海浦东新区8888号',
         receiverName: '',
         receiverPhone: '',
         receiverAddress: '',

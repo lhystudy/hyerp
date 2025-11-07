@@ -10,7 +10,7 @@
           <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleLogin" style="width: 100%">登录</el-button>
+          <el-button type="primary" @click="handleLogin" style="width: 100%" :loading="loading">登录</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import { login } from '@/api/auth'
+
 export default {
   name: 'Login',
   data() {
@@ -29,17 +31,27 @@ export default {
       rules: {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
-      }
+      },
+      loading: false
     }
   },
   methods: {
-    handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
+    async handleLogin() {
+      this.$refs.loginForm.validate(async (valid) => {
         if (valid) {
-          // 简单登录处理，实际项目中应该调用后端接口
-          this.$store.dispatch('setToken', 'mock-token')
-          this.$router.push('/')
-          this.$message.success('登录成功')
+          this.loading = true
+          try {
+            const res = await login(this.loginForm)
+            if (res.data && res.data.token) {
+              this.$store.dispatch('setToken', res.data.token)
+              this.$router.push('/')
+              this.$message.success('登录成功')
+            }
+          } catch (error) {
+            this.$message.error(error.message || '登录失败')
+          } finally {
+            this.loading = false
+          }
         }
       })
     }

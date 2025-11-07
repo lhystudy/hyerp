@@ -31,6 +31,10 @@ public class OrderService {
         return orderMapper.selectAll();
     }
 
+    public List<Order> getOrdersByStatus(Integer status) {
+        return orderMapper.selectByStatus(status);
+    }
+
     public Order getOrderById(Long id) {
         return orderMapper.selectByPrimaryKey(id);
     }
@@ -122,6 +126,18 @@ public class OrderService {
             throw new RuntimeException("订单不存在");
         }
         orderMapper.deleteByPrimaryKey(id);
+    }
+
+    public Order confirmOrder(Long id) {
+        Order order = orderMapper.selectByPrimaryKey(id);
+        if (order == null) {
+            throw new RuntimeException("订单不存在");
+        }
+        // 将订单状态更新为已确认（status=1）
+        order.setStatus(1);
+        order.setUpdateTime(new Date());
+        orderMapper.updateByPrimaryKey(order);
+        return order;
     }
 }
 

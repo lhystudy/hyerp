@@ -16,6 +16,7 @@ public interface OrderMapper {
     List<Order> selectAll();
     Order selectByOrderNo(String orderNo);
     List<Order> selectNeedReserved();
+    List<Order> selectByStatus(Integer status);
 
     List<ReservedItemPojo> selectOrderReservedItem(Long orderId);
 }

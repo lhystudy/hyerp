@@ -20,9 +20,14 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping
-    public Result<List<Order>> getOrderList() {
+    public Result<List<Order>> getOrderList(@RequestParam(required = false) Integer status) {
         try {
-            List<Order> orderList = orderService.getAllOrders();
+            List<Order> orderList;
+            if (status != null) {
+                orderList = orderService.getOrdersByStatus(status);
+            } else {
+                orderList = orderService.getAllOrders();
+            }
             return Result.success(orderList);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -70,6 +75,16 @@ public class OrderController {
         try {
             orderService.deleteOrder(id);
             return Result.success();
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/confirm")
+    public Result<Order> confirmOrder(@PathVariable Long id) {
+        try {
+            Order updated = orderService.confirmOrder(id);
+            return Result.success(updated);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

@@ -53,9 +53,9 @@ public class InventoryMapperTest {
 
     @Test
     public void testSelectByGoodsId() {
-        List<Inventory> inventoryList = inventoryMapper.selectByGoodsId(1L);
-        log.info("根据商品ID查询库存，数量: {}", inventoryList.size());
-        inventoryList.forEach(System.out::println);
+        Inventory inventoryList = inventoryMapper.selectByGoodsId(1L);
+        log.info("根据商品ID查询库存，数量: {}", inventoryList);
+//        inventoryList.forEach(System.out::println);
     }
 
     @Test
