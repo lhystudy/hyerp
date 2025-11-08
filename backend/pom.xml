@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hyerp</groupId>
-    <artifactId>okbTradeTrim</artifactId>
+    <artifactId>hyerp</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>OkbTradeTrim</name>
+    <name>hyerp</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

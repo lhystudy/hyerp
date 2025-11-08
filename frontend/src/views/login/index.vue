@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-card class="login-card">
-      <h2>ERP系统登录</h2>
+      <h2>HY_ERP系统登录(本系统仅供学习测试使用 By Lihaoyang)</h2>
       <el-form ref="loginForm" :model="loginForm" :rules="rules" label-width="80px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="loginForm.username" placeholder="请输入用户名" />

@@ -12,41 +12,12 @@
             <appender-ref ref="console"/>
         </root>
     </springProfile>
-    <springProfile name="aws">
+    <springProfile name="prod">
         <property name="LOG_PATH" value="/var/log"/>
         <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_PATH}/myapp-prod.log</file>
+            <file>${LOG_PATH}/hyerp-prod.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_PATH}/myapp-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
-                <maxHistory>30</maxHistory>
-            </rollingPolicy>
-            <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            </encoder>
-        </appender>
-        <root level="info">
-            <appender-ref ref="file"/>
-        </root>
-    </springProfile>
-    <springProfile name="prod">
-        <!-- 生产环境日志输出到文件 -->
-        <property name="LOG_PATH" value="D:\\logs"/>
-        <appender name="console"  class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            </encoder>
-        </appender>
-        <root level="info">
-            <appender-ref ref="console"/>
-        </root>
-    </springProfile>
-    <springProfile name="his">
-        <!-- 生产环境日志输出到文件 -->
-        <property name="LOG_PATH" value="D:\\logs"/>
-        <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_PATH}/myapp-his.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_PATH}/myapp-his-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+                <fileNamePattern>${LOG_PATH}/hyerp-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
                 <maxHistory>30</maxHistory>
             </rollingPolicy>
             <encoder>

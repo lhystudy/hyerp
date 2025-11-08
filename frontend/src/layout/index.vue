@@ -39,7 +39,7 @@
       <el-container>
         <el-header>
           <div class="header-content">
-            <h2>ERP管理系统</h2>
+            <h2>Hy ERP管理系统 (By Li haoyang)</h2>
             <div class="header-right">
               <el-button type="text" @click="handleLogout" icon="el-icon-switch-button">登出</el-button>
             </div>
