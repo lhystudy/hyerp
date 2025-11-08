@@ -162,17 +162,22 @@ cd hyerp
 
 1. **创建数据库**
 
-打开MySQL命令行或客户端工具，执行：
+打开MySQL命令行或客户端工具，执行创建数据库：
 
 ```sql
 CREATE DATABASE hyerp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
+创建完数据库后使用 `backend/src/main/resources/db/hyerp.sql`中的建表语句完成表的创建
 
 2. **修改数据库连接配置**
 
 编辑 `backend/src/main/resources/application.yml` 文件，修改数据库连接信息：
 
 ```yaml
+spring:
+  profiles:
+    active: dev #开发时写为dev，打包成jar包发布时修改为prod
+...    
 datasource:
   url: jdbc:mysql://127.0.0.1:3306/hyerp?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
   username: root        # 修改为您的MySQL用户名
@@ -205,7 +210,7 @@ mvn clean install
 ```bash
 mvn spring-boot:run
 ```
-
+### 本地开发需要将application.yml中active修改为dev，datasource.password修改为自己本地数据库地址
 或者使用IDE直接运行 `Application.java` 文件。
 
 4. **验证启动**

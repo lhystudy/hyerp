@@ -19,7 +19,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("ERP管理系统API文档")
-                        .description("电商ERP系统接口文档，包含用户登录、商品管理、订单管理等功能。")
+                        .description("电商HY-ERP系统接口文档(by Li HaoYang)，包含用户登录、商品管理、订单管理等功能。")
                         .version("1.0.0"));
     }
 }
